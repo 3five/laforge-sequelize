@@ -1,5 +1,5 @@
 import {Router, route} from 'laforge'
-import {pluralize} from 'inflection'
+import {pluralize, capitalize, underscore} from 'inflection'
 
 export default class CollectionRouter extends Router {
 
@@ -7,9 +7,10 @@ export default class CollectionRouter extends Router {
     super(opts)
     process.nextTick(()=> {
       this.database = opts.database
-      this.collection = opts.collection
-      this.collectionSingular = pluralize(this.collection)
-      this.model = this.database[this.collection]
+      this.collectionSingular = this.getCollectionName()
+      this.collection = pluralize(this.collectionSingular)
+      console.log(this.collectionSingular)
+      this.model = this.database[this.collectionSingular]
       this.registerRoutes()
     })
   }
@@ -44,6 +45,11 @@ export default class CollectionRouter extends Router {
   getAssociations() {
     return Object.keys(this.model.associations)
       .map(k => this.model.associations[k])
+  }
+
+  getCollectionName() {
+    let constructorName = Object.getPrototypeOf(this).constructor.name
+    return capitalize(underscore(constructorName).split('_')[0])
   }
 
 }
