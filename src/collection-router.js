@@ -22,8 +22,6 @@ export default class CollectionRouter extends Router {
       limit: 50,
       include: []
     }
-
-
     let o = merge({}, defaults, opts.query)    
     let limit = o.limit
     let offset = (o.page === 0 || o.page === 1) ? 0 : (limit * o.page)
@@ -58,7 +56,6 @@ export default class CollectionRouter extends Router {
   }
 
   getAssociations(models = []) {
-    console.log(models, this.model.associations)
     return models.map(k => this.model.associations[k])
   }
 
