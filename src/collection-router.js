@@ -1,4 +1,5 @@
 import {Router, route} from 'laforge'
+import {merge} from 'lodash'
 import {pluralize, capitalize, underscore} from 'inflection'
 
 export default class CollectionRouter extends Router {
@@ -9,7 +10,6 @@ export default class CollectionRouter extends Router {
       this.database = opts.database
       this.collectionSingular = this.getCollectionName()
       this.collection = pluralize(this.collectionSingular)
-      console.log(this.collectionSingular)
       this.model = this.database[this.collectionSingular]
       this.registerRoutes()
     })
@@ -17,7 +17,22 @@ export default class CollectionRouter extends Router {
   
   @route('get', '/')
   getAll(opts, http) {
-    return this.model.findAll()
+    let defaults = {
+      page: 0,
+      limit: 50,
+      include: []
+    }
+
+
+    let o = merge({}, defaults, opts.query)    
+    let limit = o.limit
+    let offset = (o.page === 0 || o.page === 1) ? 0 : (limit * o.page)
+    let include = this.getAssociations(this.parseInclude(o.include || []))
+    return this.model.findAll({
+      limit,
+      offset,
+      include
+    })
   }
 
   @route('post', '/')
@@ -28,7 +43,7 @@ export default class CollectionRouter extends Router {
   @route('get', '/:id')
   getOne(opts, http) {
     return this.model.findById(opts.params.id, {
-      include: this.getAssociations(opts)
+      include: this.getAssociations(this.parseInclude('all'))
     })
   }
 
@@ -42,14 +57,25 @@ export default class CollectionRouter extends Router {
     return this.model.remove(opts.params.id)
   }
 
-  getAssociations() {
-    return Object.keys(this.model.associations)
-      .map(k => this.model.associations[k])
+  getAssociations(models = []) {
+    console.log(models, this.model.associations)
+    return models.map(k => this.model.associations[k])
   }
 
   getCollectionName() {
     let constructorName = Object.getPrototypeOf(this).constructor.name
     return capitalize(underscore(constructorName).split('_')[0])
+  }
+
+  parseInclude(arr) {
+    if (Array.isArray(arr)) return arr
+    if (typeof arr === 'string') {
+      if (arr.toLowerCase() === 'all') {
+        return Object.keys(this.model.associations)
+      }
+      return arr.split(',')
+    }
+    return []
   }
 
 }
