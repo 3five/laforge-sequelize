@@ -8,9 +8,9 @@ export default class CollectionRouter extends Router {
     super(opts)
     process.nextTick(()=> {
       this.database = opts.database
-      this.collectionSingular = this.collectionName()
+      this.collectionSingular = this.getCollectionName()
       this.collection = pluralize(this.collectionSingular)
-      this.model = this.model(this.collectionSingular)
+      this.model = this.getModel(this.collectionSingular)
       this.registerRoutes()
     })
   }
@@ -25,7 +25,7 @@ export default class CollectionRouter extends Router {
     let o = merge({}, defaults, opts.query)    
     let limit = o.limit
     let offset = (o.page === 0 || o.page === 1) ? 0 : (limit * o.page)
-    let include = this.associations(this.parseInclude(o.include || []))
+    let include = this.getAssociations(this.parseInclude(o.include || []))
     return this.model.findAll({
       limit,
       offset,
@@ -41,7 +41,7 @@ export default class CollectionRouter extends Router {
   @route('get', '/:id')
   getOne(opts, http) {
     return this.model.findById(opts.params.id, {
-      include: this.associations(this.parseInclude('all'))
+      include: this.getAssociations(this.parseInclude('all'))
     })
   }
 
@@ -55,15 +55,15 @@ export default class CollectionRouter extends Router {
     return this.model.remove(opts.params.id)
   }
 
-  model(model) {
+  getModel(model) {
     return this.database[model]
   }
 
-  associations(models = []) {
+  getAssociations(models = []) {
     return models.map(k => this.model.associations[k])
   }
 
-  collectionName() {
+  getCollectionName() {
     let constructorName = Object.getPrototypeOf(this).constructor.name
     return capitalize(underscore(constructorName).split('_')[0])
   }
