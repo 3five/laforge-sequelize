@@ -20,16 +20,21 @@ export default class CollectionRouter extends Router {
     let defaults = {
       page: 0,
       limit: 50,
-      include: []
+      include: [],
+      where: {},
+      order: []
     }
     let o = merge({}, defaults, opts.query)    
     let limit = o.limit
     let offset = (o.page === 0 || o.page === 1) ? 0 : (limit * o.page)
     let include = this.getAssociations(this.parseInclude(o.include || []))
+    let { where, order } = o
     return this.model.findAll({
       limit,
       offset,
-      include
+      include,
+      where,
+      order
     })
   }
 
