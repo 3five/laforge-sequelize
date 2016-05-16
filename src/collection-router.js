@@ -67,7 +67,7 @@ export default class CollectionRouter extends Router {
 
   @route('delete', '/:id')
   remove(opts, http) {
-    return this.model.remove(opts.params.id)
+    return this.model.destroy(opts.params.id)
   }
 
   getModel(model) {
@@ -104,6 +104,10 @@ export default class CollectionRouter extends Router {
       where,
       order
     }
+  }
+
+  parseQueryString(opts) {
+
   }
 
   parseWhere(whereStr) {
