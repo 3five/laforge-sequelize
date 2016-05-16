@@ -68,9 +68,7 @@ export default class CollectionRouter extends Router {
   @route('delete', '/:id')
   remove(opts, http) {
     return this.model.destroy({
-      where: {
-        id: opts.params.id
-      }
+      where: { id: opts.params.id }
     })
   }
 
