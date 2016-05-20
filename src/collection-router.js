@@ -7,13 +7,10 @@ export default class CollectionRouter extends Router {
 
   constructor(opts) {
     super(opts)
-    process.nextTick(()=> {
-      this.database = opts.database
-      this.collectionSingular = this.getCollectionName()
-      this.collection = pluralize(this.collectionSingular)
-      this.model = this.getModel(this.collectionSingular)
-      this.registerRoutes()
-    })
+    this.database = opts.database
+    this.collectionSingular = this.getCollectionName()
+    this.collection = pluralize(this.collectionSingular)
+    this.model = this.getModel(this.collectionSingular)
   }
   
   @route('get', '/')
