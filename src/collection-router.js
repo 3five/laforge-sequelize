@@ -50,17 +50,11 @@ export default class CollectionRouter extends Router {
   @route('put', '/:id')
   update(opts, http) {
     delete opts.data.id
-    return this.model.update(opts.data, {
-      returning: true,
-      where: { id: opts.params.id }
-    }).then(([rowsAffected, data]) => {
-      if (rowsAffected === 1) {
-        return data[0]
-      } else if (rowsAffected > 1) {
-        return data
-      }
-      return null
-    })
+    return this.model.findById(opts.params.id)
+      .then(record => {
+        record.set(opts.data)
+        return record.save()
+      })
   }
 
   @route('delete', '/:id')

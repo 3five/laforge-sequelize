@@ -4,10 +4,13 @@ module.exports = function(sequelize, DataTypes) {
     firstname: DataTypes.STRING,
     lastname: DataTypes.STRING
   }, {
-    classMethods: {
-      associate: function(models) {
-        // associations can be defined here
-      }
+    hooks: {
+      afterUpdate: [
+        function doThings(instance) {
+          console.log(instance)
+          return instance
+        }
+      ]
     }
   });
   return Person;
