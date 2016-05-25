@@ -7,6 +7,7 @@ export default class CollectionRouter extends Router {
 
   constructor(opts) {
     super(opts)
+    this.opts = opts
     this.database = opts.database
     this.collectionSingular = this.getCollectionName()
     this.collection = pluralize(this.collectionSingular)
@@ -78,9 +79,12 @@ export default class CollectionRouter extends Router {
   }
 
   getCollectionName() {
-    let constructorName = Object.getPrototypeOf(this).constructor.name
+    let constructorName = this.opts.name 
+      ? this.opts.name
+      : Object.getPrototypeOf(this).constructor.name
     return capitalize(underscore(constructorName).split('_')[0])
   }
+  
   getQueryFromParams(opts) {    
     let defaults = {
       page: 0,
@@ -103,10 +107,6 @@ export default class CollectionRouter extends Router {
       where,
       order
     }
-  }
-
-  parseQueryString(opts) {
-
   }
 
   parseWhere(whereStr) {

@@ -1,6 +1,7 @@
 import {Router, route} from 'laforge'
-import {CollectionRouter} from '../lib'
+import {CollectionRouter} from '../src'
 import Express from 'express'
+import {json} from 'body-parser'
 import database from './models'
 
 class Test extends Router {
@@ -48,21 +49,32 @@ class PersonRouter extends CollectionRouter {
 
 }
 
+class SpecialRouter extends PersonRouter {
+  @route('get', '/')
+  getAll() {
+    console.log(this)
+    return this.model.findAll({
+      attributes: ['lastname']
+    })
+  }
+}
+
 const app = Express()
 export default app
 
 const baz = new Baz()
 const bar = new Bar()
 
+
+app.use(json())
 app.use(baz.handler())
 
 app.use('/child', bar.handler())
 
 
 const persons = new PersonRouter({ database })
-
-console.log(persons.routes)
-
+const special = new SpecialRouter({ name: 'Person', database })
+app.use('/people/special', special.handler())
 app.use('/people', persons.handler())
 
 app.get('/', (req, res)=> {

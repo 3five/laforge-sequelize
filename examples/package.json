@@ -14,12 +14,14 @@
   "dependencies": {
     "babel-polyfill": "^6.9.0",
     "babel-register": "^6.9.0",
+    "body-parser": "^1.15.1",
     "express": "^4.13.4",
     "laforge": "^0.1.6",
     "lodash": "^4.11.1",
     "pg": "^4.5.5",
     "qs": "^6.1.0",
-    "sequelize": "^3.23.2"
+    "sequelize": "^3.23.2",
+    "sequelize-cli": "^2.4.0"
   },
   "devDependencies": {
     "babel-loader": "^6.2.4",
