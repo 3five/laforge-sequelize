@@ -17,7 +17,11 @@ export default class CollectionRouter extends Router {
   @route('get', '/')
   getAll(opts, http) {
     let query = this.getQueryFromParams(opts)
-    return this.model.findAll(query)
+    return this.model.findAndCountAll(query)
+      .then(({result, rows})=> {
+        http.res.set({'X-Row-Count': rows})
+        return result
+      })
   }
 
   @route('get', '/search') 
@@ -32,12 +36,21 @@ export default class CollectionRouter extends Router {
         return m
       }, where)      
     }
-    return this.model.findAll(query)
+    return this.model.findAndCountAll(query)
+      .then(({result, rows})=> {
+        http.res.set({'X-Row-Count': rows})
+        return result
+      })
   }
 
   @route('post', '/')
   create(opts, http) {
     return this.model.create(opts.data)
+  }
+
+  @route('get', '/count', 99)
+  getCount(opts, http) {
+    return this.model.count()
   }
 
   @route('get', '/:id')
