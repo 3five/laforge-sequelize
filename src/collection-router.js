@@ -50,7 +50,9 @@ export default class CollectionRouter extends Router {
 
   @route('get', '/count', 99)
   getCount(opts, http) {
-    return this.model.count()
+    return this.model.count().then(count => {
+      return {count}
+    })
   }
 
   @route('get', '/:id')
