@@ -88,9 +88,10 @@ export default class CollectionRouter extends Router {
   }
 
   getCollectionName() {
-    let constructorName = this.opts.name 
-      ? this.opts.name
-      : Object.getPrototypeOf(this).constructor.name
+    if (this.opts.name) {
+      return this.opts.name
+    }
+    let constructorName = Object.getPrototypeOf(this).constructor.name
     return capitalize(underscore(constructorName).split('_')[0])
   }
   
