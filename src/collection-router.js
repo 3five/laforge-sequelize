@@ -45,7 +45,9 @@ export default class CollectionRouter extends Router {
 
   @route('post', '/')
   create(opts, http) {
-    return this.model.create(opts.data)
+    return this.model.create(opts.data, { 
+      request: opts 
+    })
   }
 
   @route('get', '/count', 99)
@@ -68,7 +70,9 @@ export default class CollectionRouter extends Router {
     return this.model.findById(opts.params.id)
       .then(record => {
         record.set(opts.data)
-        return record.save()
+        return record.save({ 
+          request: opts 
+        })
       })
   }
 
