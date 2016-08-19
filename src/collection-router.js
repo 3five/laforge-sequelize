@@ -17,8 +17,10 @@ export default class CollectionRouter extends Router {
   @route('get', '/')
   getAll(opts, http) {
     let query = this.getQueryFromParams(opts)
-    return this.model.findAndCountAll(query)
-      .then(({count, rows})=> {
+    let count = this.model.count({ where: query.where })
+    let results = this.model.findAll(query)
+    return Promise.all(count, results)
+      .then(([count, results])=> {
         http.res.set({'X-Row-Count': count})
         return rows
       })
@@ -36,8 +38,12 @@ export default class CollectionRouter extends Router {
         return m
       }, where)      
     }
-    return this.model.findAndCountAll(query)
-      .then(({count, rows})=> {
+
+    let count = this.model.count({ where: query.where })
+    let results = this.model.findAll(query)
+
+    return Promise.all(count, results)
+      .then(([count, rows])=> {
         http.res.set({'X-Row-Count': count})
         return rows
       })
