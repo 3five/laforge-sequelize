@@ -20,7 +20,7 @@ export default class CollectionRouter extends Router {
     let count = this.model.count({ where: query.where })
     let results = this.model.findAll(query)
     return Promise.all([count, results])
-      .then(([count, results])=> {
+      .then(([count, rows])=> {
         http.res.set({'X-Row-Count': count})
         return rows
       })
