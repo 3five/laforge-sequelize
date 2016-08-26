@@ -58,23 +58,32 @@ export default class CollectionRouter extends Router {
 
   @route('get', '/count', 99)
   getCount(opts, http) {
-    return this.model.count().then(count => {
+    let query = this.getQueryFromParams(opts)
+    return this.model.count({
+      include: query.include,
+      where: query.where
+    }).then(count => {
       return {count}
     })
   }
 
   @route('get', '/:id')
   getOne(opts, http) {
+    let query = this.getQueryFromParams(opts)
     return this.model.findById(opts.params.id, {
-      include: this.getAssociations(this.parseInclude('all'))
+      include: query.include,
+      where: query.where
     })
   }
 
   @route('put', '/:id')
   update(opts, http) {
     delete opts.data.id
-    return this.model.findById(opts.params.id)
-      .then(record => {
+    let query = this.getQueryFromParams(opts)
+    return this.model.findById(opts.params.id, {
+      include: query.include,
+      where: query.where
+    }).then(record => {
         record.set(opts.data)
         return record.save({ 
           request: opts 
@@ -84,7 +93,11 @@ export default class CollectionRouter extends Router {
 
   @route('delete', '/:id')
   remove(opts, http) {
-    return this.model.findById(opts.params.id).then(record => {
+    let query = this.getQueryFromParams(opts)
+    return this.model.findById(opts.params.id, {
+      include: query.include,
+      where: query.where
+    }).then(record => {
       return record.destroy()
     })
   }
