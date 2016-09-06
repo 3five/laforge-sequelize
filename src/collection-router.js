@@ -17,6 +17,15 @@ export default class CollectionRouter extends Router {
   @route('get', '/')
   getAll(opts, http) {
     let query = this.getQueryFromParams(opts)
+    let queryStr = opts.query.query
+    if (queryStr) {
+      let where = merge({}, query.where, { $or: {} })
+      query.where = reduce(fields, (m, field)=> {
+        m.$or[field] = { $iLike: `%${queryStr}%` }
+        return m
+      }, where)      
+    }
+    
     let count = this.model.count({ where: query.where })
     let results = this.model.findAll(query)
     return Promise.all([count, results])
