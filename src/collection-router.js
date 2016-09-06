@@ -20,6 +20,7 @@ export default class CollectionRouter extends Router {
     let queryStr = opts.query.query
     if (queryStr) {
       let where = merge({}, query.where, { $or: {} })
+      let fields = opts.query.fields ? opts.query.fields.split(',') : []
       query.where = reduce(fields, (m, field)=> {
         m.$or[field] = { $iLike: `%${queryStr}%` }
         return m
