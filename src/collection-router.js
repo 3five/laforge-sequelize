@@ -27,8 +27,8 @@ export default class CollectionRouter extends Router {
       }, where)      
     }
     
-    let count = this.model.count({ where: query.where })
-    let results = this.model.findAll(query)
+    let count = this.getModelFromRequest(http).count({ where: query.where })
+    let results = this.getModelFromRequest(http).findAll(query)
     return Promise.all([count, results])
       .then(([count, rows])=> {
         http.res.set({'X-Row-Count': count})
@@ -49,8 +49,8 @@ export default class CollectionRouter extends Router {
       }, where)      
     }
 
-    let count = this.model.count({ where: query.where })
-    let results = this.model.findAll(query)
+    let count = this.getModelFromRequest(http).count({ where: query.where })
+    let results = this.getModelFromRequest(http).findAll(query)
 
     return Promise.all([count, results])
       .then(([count, rows])=> {
@@ -61,7 +61,7 @@ export default class CollectionRouter extends Router {
 
   @route('post', '/')
   create(opts, http) {
-    return this.model.create(opts.data, { 
+    return this.getModelFromRequest(http).create(opts.data, { 
       request: opts 
     })
   }
@@ -69,7 +69,7 @@ export default class CollectionRouter extends Router {
   @route('get', '/count', 99)
   getCount(opts, http) {
     let query = this.getQueryFromParams(opts)
-    return this.model.count({
+    return this.getModelFromRequest(http).count({
       include: query.include,
       where: query.where
     }).then(count => {
@@ -80,7 +80,7 @@ export default class CollectionRouter extends Router {
   @route('get', '/:id')
   getOne(opts, http) {
     let query = this.getQueryFromParams(opts)
-    return this.model.findById(opts.params.id, {
+    return this.getModelFromRequest(http).findById(opts.params.id, {
       include: query.include,
       where: query.where
     })
@@ -90,7 +90,7 @@ export default class CollectionRouter extends Router {
   update(opts, http) {
     delete opts.data.id
     let query = this.getQueryFromParams(opts)
-    return this.model.findById(opts.params.id, {
+    return this.getModelFromRequest(http).findById(opts.params.id, {
       include: query.include,
       where: query.where
     }).then(record => {
@@ -104,7 +104,7 @@ export default class CollectionRouter extends Router {
   @route('delete', '/:id')
   remove(opts, http) {
     let query = this.getQueryFromParams(opts)
-    return this.model.findById(opts.params.id, {
+    return this.getModelFromRequest(http).findById(opts.params.id, {
       include: query.include,
       where: query.where
     }).then(record => {
@@ -126,6 +126,13 @@ export default class CollectionRouter extends Router {
     }
     let constructorName = Object.getPrototypeOf(this).constructor.name
     return capitalize(underscore(constructorName).split('_')[0])
+  }
+
+  getModelFromRequest(http) {
+    if (http.res.locals.model) {
+      return http.res.locals.model
+    }
+    return this.model
   }
   
   getQueryFromParams(opts) {    
